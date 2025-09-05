@@ -1,0 +1,120 @@
+<template>
+  <VuetifyLayout>
+    <v-container class="fill-height d-flex align-center justify-center">
+      <v-card max-width="500" class="mx-auto pa-6" elevation="8">
+        <v-card-title class="text-center">
+          <v-avatar color="primary" size="60" class="mb-4">
+            <v-icon size="35" color="white">mdi-motorcycle</v-icon>
+          </v-avatar>
+          <h2 class="text-h4 font-weight-bold">Welcome Back!</h2>
+          <p class="text-subtitle-1 text-grey mt-2">Sign in to your ManCycle account</p>
+        </v-card-title>
+
+      <div class="bg-white rounded-2xl shadow-2xl p-8">
+        <form @submit.prevent="submit" class="space-y-6">
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+              Email address
+            </label>
+            <input
+              id="email"
+              v-model="form.email"
+              type="email"
+              required
+              class="input-field"
+              :class="{ 'border-red-500': form.errors.email }"
+              placeholder="Enter your email"
+            >
+            <div v-if="form.errors.email" class="mt-1 text-sm text-red-600">
+              {{ form.errors.email }}
+            </div>
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <input
+              id="password"
+              v-model="form.password"
+              type="password"
+              required
+              class="input-field"
+              :class="{ 'border-red-500': form.errors.password }"
+              placeholder="Enter your password"
+            >
+            <div v-if="form.errors.password" class="mt-1 text-sm text-red-600">
+              {{ form.errors.password }}
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="remember"
+                v-model="form.remember"
+                type="checkbox"
+                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              >
+              <label for="remember" class="ml-2 block text-sm text-gray-700">
+                Remember me
+              </label>
+            </div>
+
+            <Link href="/forgot-password" class="text-sm text-blue-600 hover:text-blue-500">
+              Forgot password?
+            </Link>
+          </div>
+
+          <button
+            type="submit"
+            :disabled="form.processing"
+            class="w-full btn-primary flex items-center justify-center"
+          >
+            <svg v-if="form.processing" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ form.processing ? 'Signing in...' : 'Sign in' }}
+          </button>
+        </form>
+
+        <div class="mt-6">
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+              <span class="px-2 bg-white text-gray-500">Don't have an account?</span>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <Link
+              href="/register"
+              class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200"
+            >
+              Create new account
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { useForm, Link } from '@inertiajs/vue3'
+
+const form = useForm({
+  email: '',
+  password: '',
+  remember: false,
+})
+
+const submit = () => {
+  form.post('/login', {
+    onFinish: () => form.reset('password'),
+  })
+}
+</script>
