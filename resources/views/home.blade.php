@@ -13,72 +13,72 @@
     <div class="container">
         <div class="hero-content">
             <div class="hero-text">
-                <h1 class="hero-title">Find Your Perfect Vehicle</h1>
-                <p class="hero-subtitle">Discover premium cars, motorcycles, and quality second-hand products from verified sellers across the country</p>
+                <h1 class="hero-title">{{ __('messages.hero_title') }}</h1>
+                <p class="hero-subtitle">{{ __('messages.hero_subtitle') }}</p>
                 
                 <div class="hero-stats">
                     <div class="stat-item">
                         <span class="stat-number">10K+</span>
-                        <span class="stat-label">Vehicles</span>
+                        <span class="stat-label">{{ __('messages.stat_vehicles') }}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-number">5K+</span>
-                        <span class="stat-label">Happy Customers</span>
+                        <span class="stat-label">{{ __('messages.stat_customers') }}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-number">50+</span>
-                        <span class="stat-label">Cities</span>
+                        <span class="stat-label">{{ __('messages.stat_cities') }}</span>
                     </div>
                 </div>
             </div>
             
             <div class="hero-search">
                 <div class="search-container">
-                    <h3>What are you looking for?</h3>
+                    <h3>{{ __('messages.what_looking_for') }}</h3>
                     
                     <div class="search-tabs">
-                        <button class="search-tab active" data-tab="all">All Categories</button>
-                        <button class="search-tab" data-tab="cars">Cars</button>
-                        <button class="search-tab" data-tab="motorcycles">Motorcycles</button>
-                        <button class="search-tab" data-tab="second_hand">Second Hand</button>
+                        <button class="search-tab active" data-tab="all">{{ __('messages.all_categories') }}</button>
+                        <button class="search-tab" data-tab="cars">{{ __('messages.cars') }}</button>
+                        <button class="search-tab" data-tab="motorcycles">{{ __('messages.motorcycles') }}</button>
+                        <button class="search-tab" data-tab="second_hand">{{ __('messages.second_hand') }}</button>
                     </div>
                     
                     <form class="advanced-search" method="GET" action="{{ route('listings.index') }}">
                         <div class="search-row">
                             <div class="search-field">
-                                <label>Search</label>
-                                <input type="text" name="search" placeholder="Enter keywords..." id="searchInput">
+                                <label>{{ __('messages.search') }}</label>
+                                <input type="text" name="search" placeholder="{{ __('messages.search_keywords') }}" id="searchInput">
                             </div>
                             <div class="search-field">
-                                <label>Location</label>
-                                <input type="text" name="location" placeholder="Enter city or area">
+                                <label>{{ __('messages.location') }}</label>
+                                <input type="text" name="location" placeholder="{{ __('messages.enter_location') }}">
                             </div>
                         </div>
                         
                         <div class="search-row">
                             <div class="search-field">
-                                <label>Price Range</label>
+                                <label>{{ __('messages.price_range') }}</label>
                                 <div class="price-inputs">
-                                    <input type="number" name="min_price" placeholder="Min">
-                                    <span>to</span>
-                                    <input type="number" name="max_price" placeholder="Max">
+                                    <input type="number" name="min_price" placeholder="{{ __('messages.min_price') }}">
+                                    <span>{{ __('messages.to') }}</span>
+                                    <input type="number" name="max_price" placeholder="{{ __('messages.max_price') }}">
                                 </div>
                             </div>
                             <div class="search-field">
-                                <label>Condition</label>
+                                <label>{{ __('messages.condition') }}</label>
                                 <select name="condition">
-                                    <option value="">Any Condition</option>
-                                    <option value="new">New</option>
-                                    <option value="excellent">Excellent</option>
-                                    <option value="good">Good</option>
-                                    <option value="fair">Fair</option>
+                                    <option value="">{{ __('messages.any_condition') }}</option>
+                                    <option value="new">{{ __('messages.condition_new') }}</option>
+                                    <option value="excellent">{{ __('messages.condition_excellent') }}</option>
+                                    <option value="good">{{ __('messages.condition_good') }}</option>
+                                    <option value="fair">{{ __('messages.condition_fair') }}</option>
                                 </select>
                             </div>
                         </div>
                         
                         <button type="submit" class="search-btn">
                             <i class="fas fa-search"></i>
-                            Search Vehicles
+                            {{ __('messages.search_vehicles') }}
                         </button>
                     </form>
                 </div>
@@ -90,28 +90,28 @@
 <!-- Categories Section -->
 <section class="categories">
     <div class="container">
-        <h2 class="section-title">Browse by Category</h2>
+        <h2 class="section-title">{{ __('messages.browse_by_category') }}</h2>
         
         <div class="category-grid">
             <div class="category-card">
                 <i class="fas fa-car"></i>
-                <h3>Cars</h3>
-                <p>Find your dream car from sedans to SUVs</p>
-                <a href="{{ route('categories.show', 'cars') }}" class="btn btn-primary">Browse Cars</a>
+                <h3>{{ __('messages.cars') }}</h3>
+                <p>{{ __('messages.cars_description') }}</p>
+                <a href="{{ route('categories.show', 'cars') }}" class="btn btn-primary">{{ __('messages.browse_cars') }}</a>
             </div>
             
             <div class="category-card">
                 <i class="fas fa-motorcycle"></i>
-                <h3>Motorcycles</h3>
-                <p>Explore bikes, scooters, and motorcycles</p>
-                <a href="{{ route('categories.show', 'motorcycles') }}" class="btn btn-primary">Browse Bikes</a>
+                <h3>{{ __('messages.motorcycles') }}</h3>
+                <p>{{ __('messages.motorcycles_description') }}</p>
+                <a href="{{ route('categories.show', 'motorcycles') }}" class="btn btn-primary">{{ __('messages.browse_bikes') }}</a>
             </div>
             
             <div class="category-card">
                 <i class="fas fa-box"></i>
-                <h3>Parts & Accessories</h3>
-                <p>Quality pre-owned items and auto parts at great prices</p>
-                <a href="{{ route('categories.show', 'parts-accessories') }}" class="btn btn-primary">Browse Items</a>
+                <h3>{{ __('messages.parts_accessories') }}</h3>
+                <p>{{ __('messages.parts_description') }}</p>
+                <a href="{{ route('categories.show', 'parts-accessories') }}" class="btn btn-primary">{{ __('messages.browse_items') }}</a>
             </div>
         </div>
     </div>
@@ -120,16 +120,16 @@
 <!-- Featured Listings Section -->
 <section class="featured">
     <div class="container">
-        <h2 class="section-title">Featured Listings</h2>
+        <h2 class="section-title">{{ __('messages.featured_listings') }}</h2>
         
         <div class="listing-grid">
             @forelse($featuredListings->take(6) as $listing)
             <a href="{{ route('listings.show', $listing) }}" class="listing-card" style="text-decoration: none; color: inherit;">
                 <div class="listing-image">
                     @if($listing->is_featured)
-                    <div class="listing-badge">Featured</div>
+                    <div class="listing-badge">{{ __('messages.featured') }}</div>
                     @elseif($listing->created_at->diffInDays() < 7)
-                    <div class="listing-badge">New</div>
+                    <div class="listing-badge">{{ __('messages.new') }}</div>
                     @endif
                     
                     @php
@@ -166,13 +166,13 @@
             <!-- Sample listing if no data -->
             <div class="listing-card">
                 <div class="listing-image">
-                    <div class="listing-badge">Featured</div>
+                    <div class="listing-badge">{{ __('messages.featured') }}</div>
                     <div style="background: linear-gradient(45deg, #667eea, #764ba2); height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
                         <i class="fas fa-car"></i>
                     </div>
                 </div>
                 <div class="listing-content">
-                    <h3 class="listing-title">No listings available</h3>
+                    <h3 class="listing-title">{{ __('messages.no_listings_available') }}</h3>
                     <div class="listing-price">$0</div>
                     <div class="listing-location">
                         <i class="fas fa-map-marker-alt"></i>
@@ -184,7 +184,7 @@
         </div>
         
         <div style="text-align: center; margin-top: 3rem;">
-            <a href="{{ route('listings.index') }}" class="btn btn-primary">View All Listings</a>
+            <a href="{{ route('listings.index') }}" class="btn btn-primary">{{ __('messages.view_all_listings') }}</a>
         </div>
     </div>
 </section>
@@ -195,19 +195,19 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
             <div>
                 <div style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem;">10K+</div>
-                <div style="font-size: 1.25rem; opacity: 0.9;">Active Listings</div>
+                <div style="font-size: 1.25rem; opacity: 0.9;">{{ __('messages.active_listings_stat') }}</div>
             </div>
             <div>
                 <div style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem;">5K+</div>
-                <div style="font-size: 1.25rem; opacity: 0.9;">Happy Customers</div>
+                <div style="font-size: 1.25rem; opacity: 0.9;">{{ __('messages.stat_customers') }}</div>
             </div>
             <div>
                 <div style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem;">50+</div>
-                <div style="font-size: 1.25rem; opacity: 0.9;">Cities Covered</div>
+                <div style="font-size: 1.25rem; opacity: 0.9;">{{ __('messages.cities_covered') }}</div>
             </div>
             <div>
                 <div style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem;">24/7</div>
-                <div style="font-size: 1.25rem; opacity: 0.9;">Customer Support</div>
+                <div style="font-size: 1.25rem; opacity: 0.9;">{{ __('messages.customer_support_title') }}</div>
             </div>
         </div>
     </div>
@@ -216,31 +216,31 @@
 <!-- How It Works Section -->
 <section style="padding: 4rem 0; background: white;">
     <div class="container">
-        <h2 class="section-title">How ManCycle Works</h2>
+        <h2 class="section-title">{{ __('messages.why_choose_us') }}</h2>
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; margin-top: 3rem;">
             <div style="text-align: center;">
                 <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white; font-size: 2rem;">
                     <i class="fas fa-search"></i>
                 </div>
-                <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Browse & Search</h3>
-                <p style="color: #6b7280;">Explore thousands of listings or use our advanced search to find exactly what you're looking for.</p>
+                <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">{{ __('messages.browse') }} & {{ __('messages.search') }}</h3>
+                <p style="color: #6b7280;">{{ __('messages.manage_listings') }}</p>
             </div>
             
             <div style="text-align: center;">
                 <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white; font-size: 2rem;">
                     <i class="fas fa-comments"></i>
                 </div>
-                <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Connect & Chat</h3>
-                <p style="color: #6b7280;">Message sellers directly through our secure chat system to ask questions and negotiate.</p>
+                <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">{{ __('messages.messages') }}</h3>
+                <p style="color: #6b7280;">{{ __('messages.customer_support_desc') }}</p>
             </div>
             
             <div style="text-align: center;">
                 <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white; font-size: 2rem;">
                     <i class="fas fa-handshake"></i>
                 </div>
-                <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Meet & Buy</h3>
-                <p style="color: #6b7280;">Arrange a safe meeting, inspect the item, and complete your purchase with confidence.</p>
+                <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">{{ __('messages.best_prices_title') }}</h3>
+                <p style="color: #6b7280;">{{ __('messages.best_prices_desc') }}</p>
             </div>
         </div>
     </div>
@@ -300,9 +300,8 @@
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: 24px;
     font-weight: 800;
-    line-height: 1.1;
     margin-bottom: 1.5rem;
     background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
     -webkit-background-clip: text;

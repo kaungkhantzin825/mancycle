@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\LanguageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 
 // Home Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Language Switching
+Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 
 // Public Listing Routes (non-authenticated)
 Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');

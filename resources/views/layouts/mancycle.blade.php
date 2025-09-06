@@ -525,12 +525,20 @@
                         <span><i class="fas fa-envelope"></i> support@mancycle.com</span>
                     </div>
                     <div class="top-bar-right">
-                        <a href="{{ route('help') }}">Help</a>
+                        <a href="{{ route('help') }}">{{ __('messages.help') }}</a>
                         <span>|</span>
-                        <a href="{{ route('contact') }}">Contact</a>
+                        <a href="{{ route('contact') }}">{{ __('messages.contact') }}</a>
+                        <span>|</span>
+                        <!-- Language Switcher -->
+                        <div style="display: inline-block; position: relative;">
+                            <select onchange="switchLanguage(this.value)" style="background: transparent; border: 1px solid #6b7280; color: #d1d5db; padding: 2px 8px; border-radius: 4px; font-size: 0.875rem; cursor: pointer;">
+                                <option value="en" {{ app()->getLocale() == 'en' ? 'selected' : '' }} style="color: #1f2937;">🇬🇧 English</option>
+                                <option value="my" {{ app()->getLocale() == 'my' ? 'selected' : '' }} style="color: #1f2937;">🇲🇲 မြန်မာ</option>
+                            </select>
+                        </div>
                         @auth
                         <span>|</span>
-                        <span>Welcome, {{ Auth::user()->name }}!</span>
+                        <span>{{ __('messages.welcome') }}, {{ Auth::user()->name }}!</span>
                         @endauth
                     </div>
                 </div>
@@ -547,24 +555,24 @@
                     </a>
                 
                 <ul class="nav-links">
-                    <li><a href="{{ route('home') }}">Home</a></li>
-                    <li><a href="{{ route('listings.index') }}">Browse</a></li>
-                    <li><a href="{{ route('categories.index') }}">Categories</a></li>
+                    <li><a href="{{ route('home') }}">{{ __('messages.home') }}</a></li>
+                    <li><a href="{{ route('listings.index') }}">{{ __('messages.browse') }}</a></li>
+                    <li><a href="{{ route('categories.index') }}">{{ __('messages.categories') }}</a></li>
                     @auth
-                        <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li><a href="{{ route('messages.index') }}">Messages</a></li>
-                        <li><a href="{{ route('favorites.index') }}">Favorites</a></li>
+                        <li><a href="{{ route('dashboard') }}">{{ __('messages.dashboard') }}</a></li>
+                        <li><a href="{{ route('messages.index') }}">{{ __('messages.messages') }}</a></li>
+                        <li><a href="{{ route('favorites.index') }}">{{ __('messages.favorites') }}</a></li>
                     @endauth
                 </ul>
                 
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     @guest
-                        <a href="{{ route('login') }}" class="btn btn-outline">Login</a>
-                        <a href="{{ route('register') }}" class="btn btn-primary">Sign Up</a>
+                        <a href="{{ route('login') }}" class="btn btn-outline">{{ __('messages.login') }}</a>
+                        <a href="{{ route('register') }}" class="btn btn-primary">{{ __('messages.register') }}</a>
                     @else
                         <a href="{{ route('listings.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus"></i>
-                            Sell Now
+                            {{ __('messages.sell_now') }}
                         </a>
                         
                         <!-- User Dropdown -->
@@ -578,23 +586,23 @@
                             <div class="dropdown-menu" id="userDropdown">
                                 <a href="{{ route('dashboard') }}">
                                     <i class="fas fa-tachometer-alt" style="width: 20px;"></i>
-                                    Dashboard
+                                    {{ __('messages.dashboard') }}
                                 </a>
                                 <a href="{{ route('profile.edit') }}">
                                     <i class="fas fa-user" style="width: 20px;"></i>
-                                    Profile
+                                    {{ __('messages.profile') }}
                                 </a>
                                 @if(Auth::user()->role === 'super_admin')
                                 <a href="{{ route('admin.dashboard') }}">
                                     <i class="fas fa-cog" style="width: 20px;"></i>
-                                    Admin Panel
+                                    {{ __('messages.admin_panel') }}
                                 </a>
                                 @endif
                                 <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                                     @csrf
                                     <button type="submit" class="logout-btn">
                                         <i class="fas fa-sign-out-alt" style="width: 20px;"></i>
-                                        Logout
+                                        {{ __('messages.logout') }}
                                     </button>
                                 </form>
                             </div>
@@ -688,6 +696,11 @@
                 dropdown.classList.remove('show');
             }
         });
+        
+        // Language switcher function
+        function switchLanguage(locale) {
+            window.location.href = '{{ url('/language') }}/' + locale;
+        }
     </script>
 
     @stack('scripts')
