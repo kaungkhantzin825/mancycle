@@ -29,6 +29,7 @@
             line-height: 1.6;
             color: #1f2937;
             background-color: #ffffff;
+            font-size: 0.9rem; /* Compact global font size */
         }
         
         .container {
@@ -94,7 +95,7 @@
         }
         
         .logo {
-            font-size: 2.2rem;
+            font-size: 1.75rem;
             font-weight: 800;
             text-decoration: none;
             color: #1f2937;
@@ -104,7 +105,7 @@
         }
         
         .logo i {
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: #f59e0b;
         }
         
@@ -118,7 +119,7 @@
         .nav-links {
             display: flex;
             list-style: none;
-            gap: 3rem;
+            gap: 2rem;
             align-items: center;
         }
         
@@ -126,7 +127,7 @@
             color: #4b5563;
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.95rem;
+            font-size: 0.875rem;
             transition: all 0.3s ease;
             padding: 0.75rem 0;
             position: relative;
@@ -152,11 +153,11 @@
         }
         
         .btn {
-            padding: 0.75rem 1.5rem;
+            padding: 0.5rem 1rem;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
@@ -164,6 +165,14 @@
             align-items: center;
             gap: 0.5rem;
             text-align: center;
+        }
+
+        /* Compact form controls */
+        input, select, textarea {
+            font-size: 0.9rem;
+        }
+        input, select {
+            padding: 0.6rem 0.75rem;
         }
         
         .btn-primary {
@@ -217,7 +226,7 @@
             gap: 0.5rem;
             transition: all 0.3s ease;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
         }
 
         .user-btn:hover {
@@ -287,7 +296,7 @@
         }
         
         .footer-section h3 {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 1rem;
         }
@@ -412,7 +421,7 @@
         }
         
         .listing-title {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #1f2937;
             margin-bottom: 0.75rem;
@@ -423,7 +432,7 @@
         }
         
         .listing-price {
-            font-size: 1.75rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #059669;
             margin-bottom: 0.75rem;
@@ -444,7 +453,7 @@
         
         /* Section Styles */
         .section-title {
-            font-size: 2.5rem;
+            font-size: 1.875rem;
             font-weight: 700;
             text-align: center;
             color: #1f2937;
@@ -488,13 +497,13 @@
         }
         
         .category-card i {
-            font-size: 3rem;
+            font-size: 2.25rem;
             color: #f59e0b;
             margin-bottom: 1rem;
         }
         
         .category-card h3 {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 600;
             color: #1f2937;
             margin-bottom: 0.75rem;
@@ -559,8 +568,29 @@
                     <li><a href="{{ route('listings.index') }}">{{ __('messages.browse') }}</a></li>
                     <li><a href="{{ route('categories.index') }}">{{ __('messages.categories') }}</a></li>
                     @auth
+                        @php
+                            $user = Auth::user();
+                            $unreadCount = \App\Models\Chat::where(function($q) use ($user){
+                                    $q->where('buyer_id', $user->id)->orWhere('seller_id', $user->id);
+                                })
+                                ->when(true, function($q) use ($user){
+                                    if ($user->role === 'buyer') {
+                                        $q->where('is_read_by_buyer', false);
+                                    } else {
+                                        $q->where('is_read_by_seller', false);
+                                    }
+                                })
+                                ->count();
+                        @endphp
                         <li><a href="{{ route('dashboard') }}">{{ __('messages.dashboard') }}</a></li>
-                        <li><a href="{{ route('messages.index') }}">{{ __('messages.messages') }}</a></li>
+                        <li>
+                            <a href="{{ route('messages.index') }}" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                                {{ __('messages.messages') }}
+                                @if($unreadCount > 0)
+                                <span style="background:#ef4444; color:#fff; border-radius:999px; padding:0 0.4rem; font-size:0.7rem; line-height:1.25rem; min-width:1.25rem; text-align:center;">{{ $unreadCount }}</span>
+                                @endif
+                            </a>
+                        </li>
                         <li><a href="{{ route('favorites.index') }}">{{ __('messages.favorites') }}</a></li>
                     @endauth
                 </ul>
@@ -570,10 +600,12 @@
                         <a href="{{ route('login') }}" class="btn btn-outline">{{ __('messages.login') }}</a>
                         <a href="{{ route('register') }}" class="btn btn-primary">{{ __('messages.register') }}</a>
                     @else
+                        @if(Auth::user()->role !== 'buyer')
                         <a href="{{ route('listings.create') }}" class="btn btn-primary">
                             <i class="fas fa-plus"></i>
                             {{ __('messages.sell_now') }}
                         </a>
+                        @endif
                         
                         <!-- User Dropdown -->
                         <div class="user-dropdown">

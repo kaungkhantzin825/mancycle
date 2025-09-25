@@ -44,14 +44,28 @@
                     </div>
                     
                     <form class="advanced-search" method="GET" action="{{ route('listings.index') }}">
-                        <div class="search-row">
+                        <div class="search-row three-cols">
                             <div class="search-field">
                                 <label>{{ __('messages.search') }}</label>
                                 <input type="text" name="search" placeholder="{{ __('messages.search_keywords') }}" id="searchInput">
                             </div>
                             <div class="search-field">
-                                <label>{{ __('messages.location') }}</label>
-                                <input type="text" name="location" placeholder="{{ __('messages.enter_location') }}">
+                                <label>Region/State</label>
+                                <select name="region_id" id="hero_filter_region_id">
+                                    <option value="">All Regions</option>
+                                    @php
+                                        $regions = App\Models\Location::whereNull('parent_id')->where('is_active', true)->orderBy('name')->get();
+                                    @endphp
+                                    @foreach($regions as $reg)
+                                        <option value="{{ $reg->id }}">{{ $reg->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label>City</label>
+                                <select name="location_id" id="hero_filter_location_id" disabled>
+                                    <option value="">First select Region</option>
+                                </select>
                             </div>
                         </div>
                         
@@ -155,7 +169,7 @@
                 </div>
                 <div class="listing-content">
                     <h3 class="listing-title">{{ $listing->title }}</h3>
-                    <div class="listing-price">${{ number_format($listing->price) }}</div>
+                    <div class="listing-price">MMK {{ number_format($listing->price) }}</div>
                     <div class="listing-location">
                         <i class="fas fa-map-marker-alt"></i>
                         {{ $listing->location }}
@@ -391,6 +405,11 @@
     gap: 1rem;
 }
 
+/* First row with Search, Region, City */
+.search-row.three-cols {
+    grid-template-columns: 2fr 1fr 1fr;
+}
+
 .search-field {
     display: flex;
     flex-direction: column;
@@ -456,6 +475,12 @@
     box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
 }
 
+@media (max-width: 1024px) {
+    .search-row.three-cols {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
 @media (max-width: 768px) {
     .hero-content {
         grid-template-columns: 1fr;
@@ -466,7 +491,8 @@
         font-size: 2.5rem;
     }
     
-    .search-row {
+    .search-row,
+    .search-row.three-cols {
         grid-template-columns: 1fr;
     }
     
@@ -482,6 +508,47 @@
 @endpush
 
 @push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const regionSelect = document.getElementById('hero_filter_region_id');
+    const citySelect = document.getElementById('hero_filter_location_id');
+
+    if (!regionSelect || !citySelect) return;
+
+    function loadCities(regionId) {
+        if (!regionId) {
+            citySelect.innerHTML = '<option value="">First select Region</option>';
+            citySelect.disabled = true;
+            return;
+        }
+        citySelect.disabled = true;
+        citySelect.innerHTML = '<option value="">Loading...</option>';
+        fetch(`/api/locations/descendants?region_id=${regionId}`)
+            .then(r => {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(list => {
+                citySelect.innerHTML = '<option value="">All Cities</option>';
+                list.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.id;
+                    opt.textContent = item.name;
+                    citySelect.appendChild(opt);
+                });
+                citySelect.disabled = false;
+            })
+            .catch(err => {
+                console.error('Failed to load cities:', err);
+                citySelect.innerHTML = '<option value="">Error loading cities</option>';
+            });
+    }
+
+    regionSelect.addEventListener('change', function () {
+        loadCities(this.value);
+    });
+});
+</script>
 <script>
 // Search tab functionality
 document.querySelectorAll('.search-tab').forEach(tab => {

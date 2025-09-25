@@ -12,6 +12,10 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
+        // If an admin or super_admin hits /dashboard, send them to the admin panel
+        if (in_array($user->role, ['admin', 'super_admin'])) {
+            return redirect()->route('admin.dashboard');
+        }
         
         $stats = [
             'total_listings' => $user->listings()->count(),

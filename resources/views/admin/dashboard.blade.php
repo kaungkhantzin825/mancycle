@@ -4,10 +4,11 @@
 
 @section('content')
 <!-- Page Header -->
-<div style="margin-bottom: 2rem;">
-    <h1 style="font-size: 1.875rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">Dashboard Overview</h1>
-    <p style="color: #6b7280;">Welcome back, {{ auth()->user()->name }}! Here's what's happening on your platform.</p>
+<div style="margin-bottom: 1.25rem;">
+    <h1 style="font-size: 1.35rem; font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">Dashboard Overview</h1>
+    <p style="color: #6b7280; font-size: 0.9rem;">Welcome back, {{ auth()->user()->name }}! Here's what's happening on your platform.</p>
 </div>
+
 <!-- Stats Cards -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
     <div class="stat-card">
@@ -62,16 +63,16 @@
 </div>
 
         <!-- Quick Actions -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 3rem;">
-            <a href="{{ route('admin.users.index') }}" class="btn btn-primary" style="justify-content: center; padding: 1rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 2rem;">
+            <a href="{{ route('admin.users.index') }}" class="btn btn-primary" style="justify-content: center; padding: 0.6rem 1rem;">
                 <i class="fas fa-users"></i>
                 Manage Users
             </a>
-            <a href="{{ route('admin.listings.index') }}" class="btn btn-primary" style="justify-content: center; padding: 1rem;">
+            <a href="{{ route('admin.listings.index') }}" class="btn btn-primary" style="justify-content: center; padding: 0.6rem 1rem;">
                 <i class="fas fa-list"></i>
                 Manage Listings
             </a>
-            <a href="{{ route('admin.categories.index') }}" class="btn btn-primary" style="justify-content: center; padding: 1rem;">
+            <a href="{{ route('admin.categories.index') }}" class="btn btn-primary" style="justify-content: center; padding: 0.6rem 1rem;">
                 <i class="fas fa-tags"></i>
                 Manage Categories
             </a>
@@ -132,7 +133,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f9fafb; border-radius: 0.5rem;">
                         <div>
                             <div style="font-weight: 600; color: #1f2937;">{{ $listing->title }}</div>
-                            <div style="color: #059669; font-weight: 600;">${{ number_format($listing->price) }}</div>
+                            <div style="color: #059669; font-weight: 600;">MMK {{ number_format($listing->price) }}</div>
                             <div style="color: #6b7280; font-size: 0.875rem;">by {{ $listing->user->name }}</div>
                             <div style="color: #9ca3af; font-size: 0.75rem;">{{ $listing->created_at->diffForHumans() }}</div>
                         </div>
@@ -182,8 +183,8 @@
 <style>
 .stat-card {
     background: white;
-    border-radius: 1rem;
-    padding: 1.5rem;
+    border-radius: 0.75rem;
+    padding: 1rem;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -196,18 +197,18 @@
 }
 
 .stat-icon {
-    width: 60px;
-    height: 60px;
+    width: 48px;
+    height: 48px;
     border-radius: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
 }
 
 .stat-number {
-    font-size: 2rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: #1f2937;
 }
@@ -219,8 +220,8 @@
 
 .dashboard-card {
     background: white;
-    border-radius: 1rem;
-    padding: 1.5rem;
+    border-radius: 0.75rem;
+    padding: 1rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -234,7 +235,7 @@
 }
 
 .card-header h3 {
-    font-size: 1.25rem;
+    font-size: 1.05rem;
     font-weight: 600;
     color: #1f2937;
 }
@@ -243,7 +244,7 @@
     color: #667eea;
     text-decoration: none;
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
 }
 
 .btn-link:hover {

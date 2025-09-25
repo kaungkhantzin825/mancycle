@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Listing;
 use App\Models\User;
 use App\Models\Category;
+use App\Models\Location;
 
 class ListingSeeder extends Seeder
 {
@@ -222,6 +223,95 @@ class ListingSeeder extends Seeder
                 $listingData['updated_at'] = $listingData['created_at'];
 
                 Listing::create($listingData);
+            }
+        }
+
+        // Myanmar demo listings for Yangon Region -> Insein
+        $insein = Location::where('name', 'Insein')->first();
+        if ($insein) {
+            $yangonDemoListings = [
+                [
+                    'title' => 'Toyota Mark II 2002 - Good Condition (Insein)',
+                    'description' => 'Right hand drive, well maintained. Aircon cold, engine smooth. Registered in Yangon. Test drive available in Insein.',
+                    'price' => 18500,
+                    'condition' => 'good',
+                    'brand' => 'Toyota',
+                    'model' => 'Mark II',
+                    'year' => 2002,
+                    'fuel_type' => 'Gasoline',
+                    'mileage' => 125000,
+                    'transmission' => 'Automatic',
+                    'color' => 'Silver',
+                    'category_pick' => 'cars',
+                ],
+                [
+                    'title' => 'Honda Dio 110cc 2019 - Daily Use (Insein)',
+                    'description' => 'Reliable scooter for city commuting. Good fuel economy. Kept under shade. Location: Insein Township.',
+                    'price' => 780,
+                    'condition' => 'excellent',
+                    'brand' => 'Honda',
+                    'model' => 'Dio 110',
+                    'year' => 2019,
+                    'fuel_type' => 'Gasoline',
+                    'mileage' => 9000,
+                    'transmission' => 'Automatic',
+                    'color' => 'White',
+                    'category_pick' => 'scooters',
+                ],
+                [
+                    'title' => 'Yamaha FZ-S 150cc 2018 - Clean Bike (Insein)',
+                    'description' => 'No accident, smooth engine, new tires. Great for Yangon traffic. Viewing in Insein.',
+                    'price' => 980,
+                    'condition' => 'good',
+                    'brand' => 'Yamaha',
+                    'model' => 'FZ-S',
+                    'year' => 2018,
+                    'fuel_type' => 'Gasoline',
+                    'mileage' => 22000,
+                    'transmission' => 'Manual',
+                    'color' => 'Black',
+                    'category_pick' => 'motorcycles',
+                ],
+            ];
+
+            foreach ($yangonDemoListings as $data) {
+                // Choose category set by type bucket
+                $category = null;
+                switch ($data['category_pick']) {
+                    case 'cars':
+                        $category = $carCategories->first();
+                        break;
+                    case 'motorcycles':
+                        $category = $motorcycleCategories->first();
+                        break;
+                    case 'scooters':
+                        $category = $scooterCategories->first();
+                        break;
+                }
+                if (!$category) continue;
+
+                $payload = [
+                    'title' => $data['title'],
+                    'description' => $data['description'],
+                    'price' => $data['price'],
+                    'condition' => $data['condition'],
+                    'brand' => $data['brand'],
+                    'model' => $data['model'],
+                    'year' => $data['year'],
+                    'fuel_type' => $data['fuel_type'],
+                    'mileage' => $data['mileage'],
+                    'transmission' => $data['transmission'],
+                    'color' => $data['color'],
+                    'location' => $insein->full_name,
+                    'location_id' => $insein->id,
+                    'category_id' => $category->id,
+                    'user_id' => ($superAdmin?->id) ?? $sellers->random()->id,
+                    'status' => 'approved',
+                    'created_at' => now()->subDays(rand(1, 7)),
+                    'updated_at' => now()->subDays(rand(1, 7)),
+                ];
+
+                Listing::create($payload);
             }
         }
     }

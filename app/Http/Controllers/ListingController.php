@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Listing;
 use App\Models\Category;
+use App\Models\Location;
 use Inertia\Inertia;
 
 class ListingController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Listing::with(['category', 'user'])
+        $query = Listing::with(['category', 'user', 'location'])
             ->where('status', 'approved');
 
         // Search functionality
@@ -46,9 +47,36 @@ class ListingController extends Controller
             $query->whereIn('condition', $request->condition);
         }
 
-        // Location filter
+        // Location filter (old text-based)
         if ($request->filled('location')) {
             $query->where('location', 'like', "%{$request->location}%");
+        }
+        
+        // Region filter: include all descendant location IDs of the region (cities/townships)
+        if ($request->filled('region_id')) {
+            $region = Location::find($request->region_id);
+            if ($region) {
+                $descendants = $region->descendants();
+                $ids = $descendants->pluck('id')->toArray();
+                // If also a specific city/location is chosen, the more specific filter below will narrow it further
+                if (!empty($ids)) {
+                    $query->whereIn('location_id', $ids);
+                }
+            }
+        }
+        
+        // New location filter (by location_id)
+        if ($request->filled('location_id')) {
+            $locationIds = [$request->location_id];
+            
+            // Include all child locations
+            $location = \App\Models\Location::find($request->location_id);
+            if ($location) {
+                $descendants = $location->descendants();
+                $locationIds = array_merge($locationIds, $descendants->pluck('id')->toArray());
+            }
+            
+            $query->whereIn('location_id', $locationIds);
         }
 
         // Sorting
@@ -107,16 +135,32 @@ class ListingController extends Controller
 
     public function create()
     {
+        // Only non-buyers can create listings
+        if (auth()->check() && auth()->user()->role === 'buyer') {
+            return redirect()->route('dashboard')
+                ->with('error', 'Buyers are not allowed to create listings.');
+        }
         $categories = Category::where('is_active', true)
             ->whereNotNull('parent_id')
             ->with('parent')
             ->get();
             
-        return view('listings.create', compact('categories'));
+        // Get parent locations (regions/states)
+        $parentLocations = Location::whereNull('parent_id')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+            
+        return view('listings.create', compact('categories', 'parentLocations'));
     }
 
     public function store(Request $request)
     {
+        // Only non-buyers can store listings
+        if (auth()->check() && auth()->user()->role === 'buyer') {
+            return redirect()->route('dashboard')
+                ->with('error', 'Buyers are not allowed to create listings.');
+        }
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -131,6 +175,10 @@ class ListingController extends Controller
             'transmission' => 'nullable|string|max:50',
             'color' => 'nullable|string|max:50',
             'location' => 'required|string|max:255',
+            'location_id' => 'required|exists:locations,id',
+            'detailed_address' => 'nullable|string|max:500',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'contact_phone' => 'nullable|string|max:20',
             'phone_privacy' => 'boolean',
         ]);
@@ -153,7 +201,30 @@ class ListingController extends Controller
             ->with('parent')
             ->get();
             
-        return view('listings.edit', compact('listing', 'categories'));
+        // Get parent locations (regions/states)
+        $parentLocations = Location::whereNull('parent_id')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+            
+        // Get child locations if listing has location_id
+        $childLocations = [];
+        $parentLocationId = null;
+        if ($listing->location_id) {
+            $listing->load('location');
+            if ($listing->location && $listing->location->parent_id) {
+                $parentLocationId = $listing->location->parent_id;
+                $childLocations = Location::where('parent_id', $parentLocationId)
+                    ->where('is_active', true)
+                    ->orderBy('name')
+                    ->get();
+            } elseif ($listing->location) {
+                // The location is a parent location itself
+                $parentLocationId = $listing->location->id;
+            }
+        }
+            
+        return view('listings.edit', compact('listing', 'categories', 'parentLocations', 'childLocations', 'parentLocationId'));
     }
 
     public function update(Request $request, Listing $listing)
@@ -174,6 +245,10 @@ class ListingController extends Controller
             'transmission' => 'nullable|string|max:50',
             'color' => 'nullable|string|max:50',
             'location' => 'required|string|max:255',
+            'location_id' => 'required|exists:locations,id',
+            'detailed_address' => 'nullable|string|max:500',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'contact_phone' => 'nullable|string|max:20',
             'phone_privacy' => 'boolean',
         ]);
@@ -197,5 +272,20 @@ class ListingController extends Controller
         
         return redirect()->route('dashboard')
             ->with('success', 'Listing deleted successfully!');
+    }
+
+    /**
+     * Get child locations for cascading dropdowns
+     */
+    public function getLocationChildren(Request $request)
+    {
+        $parentId = $request->get('parent_id');
+        
+        $children = Location::where('parent_id', $parentId)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'type']);
+            
+        return response()->json($children);
     }
 }

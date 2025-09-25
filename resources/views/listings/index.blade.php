@@ -10,9 +10,9 @@
         
         <!-- Advanced Search Bar -->
         <div style="max-width: 1200px; margin: 0 auto;">
-            <form method="GET" action="{{ route('listings.index') }}" style="background: white; border-radius: 1rem; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
-                <!-- First Row: Search and Category -->
-                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <form method="GET" action="{{ route('listings.index') }}" class="search-form" style="background: white; border-radius: 1rem; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+                <!-- First Row: Search, Category, Region, City -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                     <div>
                         <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">Search Keywords</label>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search for cars, motorcycles, parts..." 
@@ -34,9 +34,22 @@
                     </div>
                     
                     <div>
-                        <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">Location</label>
-                        <input type="text" name="location" value="{{ request('location') }}" placeholder="City or area" 
-                               style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem;">
+                        <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">Region/State</label>
+                        <select name="region_id" id="filter_region_id" style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem; cursor: pointer;">
+                            <option value="">All Regions</option>
+                            @php
+                                $regions = App\Models\Location::whereNull('parent_id')->where('is_active', true)->orderBy('name')->get();
+                            @endphp
+                            @foreach($regions as $reg)
+                                <option value="{{ $reg->id }}" {{ request('region_id') == $reg->id ? 'selected' : '' }}>{{ $reg->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">City</label>
+                        <select name="location_id" id="filter_location_id" style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem; cursor: pointer;" {{ request('region_id') ? '' : 'disabled' }}>
+                            <option value="">{{ request('region_id') ? 'Loading...' : 'First select Region' }}</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -45,18 +58,18 @@
                     <div>
                         <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">Min Price</label>
                         <div style="position: relative;">
-                            <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #6b7280;">$</span>
+                            <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #6b7280;">MMK</span>
                             <input type="number" name="min_price" value="{{ request('min_price') }}" placeholder="0" min="0"
-                                   style="width: 100%; padding: 0.875rem 0.875rem 0.875rem 1.75rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem;">
+                                   style="width: 100%; padding: 0.875rem 0.875rem 0.875rem 3.25rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem;">
                         </div>
                     </div>
                     
                     <div>
                         <label style="display: block; color: #374151; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">Max Price</label>
                         <div style="position: relative;">
-                            <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #6b7280;">$</span>
+                            <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #6b7280;">MMK</span>
                             <input type="number" name="max_price" value="{{ request('max_price') }}" placeholder="Any" min="0"
-                                   style="width: 100%; padding: 0.875rem 0.875rem 0.875rem 1.75rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem;">
+                                   style="width: 100%; padding: 0.875rem 0.875rem 0.875rem 3.25rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem;">
                         </div>
                     </div>
                     
@@ -93,7 +106,7 @@
                     <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                         <span style="color: #6b7280; font-size: 0.875rem;">Quick Filters:</span>
                         <a href="{{ route('listings.index') }}?condition=new" class="quick-filter">🆕 New Only</a>
-                        <a href="{{ route('listings.index') }}?max_price=10000" class="quick-filter">💰 Under $10,000</a>
+                        <a href="{{ route('listings.index') }}?max_price=10000" class="quick-filter">💰 Under MMK 10,000</a>
                         <a href="{{ route('listings.index') }}?category=cars" class="quick-filter">🚗 Cars Only</a>
                         <a href="{{ route('listings.index') }}?category=motorcycles" class="quick-filter">🏍️ Motorcycles Only</a>
                         <a href="{{ route('listings.index') }}" class="quick-filter" style="color: #ef4444;">❌ Clear All</a>
@@ -151,7 +164,7 @@
                         </div>
                         <div class="listing-content">
                             <h3 class="listing-title">{{ $listing->title }}</h3>
-                            <div class="listing-price">${{ number_format($listing->price) }}</div>
+                            <div class="listing-price">MMK {{ number_format($listing->price) }}</div>
                             <div class="listing-location">
                                 <i class="fas fa-map-marker-alt"></i>
                                 {{ $listing->location }}
@@ -251,6 +264,58 @@
     }
 }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const regionSelect = document.getElementById('filter_region_id');
+    const citySelect = document.getElementById('filter_location_id');
+    const initialRegionId = '{{ request('region_id') }}';
+    const initialCityId = '{{ request('location_id') }}';
+
+    function loadCities(regionId, preselectId = null) {
+        if (!regionId) {
+            citySelect.innerHTML = '<option value="">First select Region</option>';
+            citySelect.disabled = true;
+            return;
+        }
+        citySelect.disabled = true;
+        citySelect.innerHTML = '<option value="">Loading...</option>';
+        fetch(`/api/locations/descendants?region_id=${regionId}`)
+            .then(r => {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(list => {
+                citySelect.innerHTML = '<option value="">All Cities</option>';
+                list.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.id;
+                    opt.textContent = item.name;
+                    citySelect.appendChild(opt);
+                });
+                citySelect.disabled = false;
+                if (preselectId) {
+                    citySelect.value = preselectId;
+                }
+            })
+            .catch(err => {
+                console.error('Failed to load cities:', err);
+                citySelect.innerHTML = '<option value="">Error loading cities</option>';
+            });
+    }
+
+    regionSelect.addEventListener('change', function () {
+        loadCities(this.value);
+    });
+
+    // If page loaded with a region filter, populate cities and preselect
+    if (initialRegionId) {
+        loadCities(initialRegionId, initialCityId || null);
+    }
+});
+</script>
 @endpush
 
 @push('scripts')

@@ -29,6 +29,7 @@
             font-family: 'Inter', sans-serif;
             background: #f3f4f6;
             color: #1f2937;
+            font-size: 0.9rem; /* Compact base font size */
         }
         
         .admin-container {
@@ -144,7 +145,7 @@
         /* Top Navigation Bar */
         .admin-topbar {
             background: white;
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
@@ -174,7 +175,7 @@
             align-items: center;
             gap: 0.5rem;
             color: #6b7280;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
         
         .breadcrumb a {
@@ -263,15 +264,20 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.625rem 1.25rem;
+            padding: 0.5rem 1rem;
             border: none;
             border-radius: 0.5rem;
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.825rem;
             cursor: pointer;
             transition: all 0.2s ease;
             text-decoration: none;
         }
+
+        /* Compact headings */
+        h1 { font-size: 1.5rem; }
+        h2 { font-size: 1.25rem; }
+        h3 { font-size: 1.05rem; }
         
         .btn-primary {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);

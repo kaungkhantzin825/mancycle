@@ -59,7 +59,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/messages', [ChatController::class, 'index'])->name('messages.index');
     Route::get('/messages/{chat}', [ChatController::class, 'show'])->name('messages.show');
     Route::post('/messages/{chat}', [ChatController::class, 'store'])->name('messages.store');
-    Route::post('/listings/{listing}/message', [ChatController::class, 'create'])->name('messages.create');
+    // Allow GET and POST so button links or forms both work
+    Route::match(['GET','POST'], '/listings/{listing}/message', [ChatController::class, 'create'])->name('messages.create');
     
     // Favorites Routes
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
@@ -74,6 +75,9 @@ Route::middleware('auth')->group(function () {
 
 // Public route for viewing listing details (must be after authenticated routes to avoid conflicts)
 Route::get('/listings/{listing}', [ListingController::class, 'show'])->name('listings.show');
+
+// API route for location children (public)
+Route::get('/api/locations/children', [ListingController::class, 'getLocationChildren'])->name('api.locations.children');
 
 // Admin Routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -111,6 +115,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/categories/{category}', [AdminController::class, 'updateCategory'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminController::class, 'destroyCategory'])->name('categories.destroy');
     Route::patch('/categories/{category}/toggle', [AdminController::class, 'toggleCategory'])->name('categories.toggle');
+    
+    // Locations Management
+    Route::get('/locations', [\App\Http\Controllers\LocationController::class, 'index'])->name('locations.index');
+    Route::get('/locations/create', [\App\Http\Controllers\LocationController::class, 'create'])->name('locations.create');
+    Route::post('/locations', [\App\Http\Controllers\LocationController::class, 'store'])->name('locations.store');
+    Route::get('/locations/{location}/edit', [\App\Http\Controllers\LocationController::class, 'edit'])->name('locations.edit');
+    Route::patch('/locations/{location}', [\App\Http\Controllers\LocationController::class, 'update'])->name('locations.update');
+    Route::delete('/locations/{location}', [\App\Http\Controllers\LocationController::class, 'destroy'])->name('locations.destroy');
+    Route::patch('/locations/{location}/toggle', [\App\Http\Controllers\LocationController::class, 'toggleStatus'])->name('locations.toggle');
+    Route::get('/locations/children', [\App\Http\Controllers\LocationController::class, 'getChildren'])->name('locations.children');
+    Route::get('/locations/search', [\App\Http\Controllers\LocationController::class, 'search'])->name('locations.search');
     
     // Messages Management
     Route::get('/messages', [AdminController::class, 'messages'])->name('messages');

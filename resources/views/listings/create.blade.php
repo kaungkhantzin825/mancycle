@@ -171,14 +171,76 @@
                         Contact Information
                     </h3>
                     
+                    <!-- Location Selection -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151;">
+                                Region/State <span style="color: #ef4444;">*</span>
+                            </label>
+                            <select id="region_id" name="region_id" required
+                                    style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem;">
+                                <option value="">Select Region/State</option>
+                                @foreach($parentLocations as $location)
+                                <option value="{{ $location->id }}" {{ old('region_id') == $location->id ? 'selected' : '' }}>
+                                    {{ $location->name }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151;">
+                                City <span style="color: #ef4444;">*</span>
+                            </label>
+                            <select id="location_id" name="location_id" required
+                                    style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem;"
+                                    disabled>
+                                <option value="">First select Region</option>
+                            </select>
+                        </div>
+                    </div>
+                    
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151;">
-                            Location <span style="color: #ef4444;">*</span>
+                            Detailed Address
                         </label>
-                        <input type="text" name="location" value="{{ old('location') }}" required
+                        <input type="text" name="detailed_address" value="{{ old('detailed_address') }}"
                                style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem;"
-                               placeholder="e.g., Los Angeles, CA">
+                               placeholder="Street address, building name, etc.">
                     </div>
+                    
+                    <!-- Coordinates Section -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="color: #374151; margin-bottom: 1rem; font-weight: 600;">Location Coordinates (Optional)</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: end;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151;">Latitude</label>
+                                <input type="number" id="latitude" name="latitude" value="{{ old('latitude') }}"
+                                       step="any" min="-90" max="90"
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem;"
+                                       placeholder="e.g., 16.8661">
+                            </div>
+                            
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151;">Longitude</label>
+                                <input type="number" id="longitude" name="longitude" value="{{ old('longitude') }}"
+                                       step="any" min="-180" max="180"
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem;"
+                                       placeholder="e.g., 96.1951">
+                            </div>
+                            
+                            <div>
+                                <button type="button" id="get_location_btn"
+                                        style="padding: 0.75rem 1rem; background: #10b981; color: white; border: none; border-radius: 0.5rem; font-weight: 500; cursor: pointer; white-space: nowrap;">
+                                    Get My Location
+                                </button>
+                            </div>
+                        </div>
+                        <small style="color: #6b7280; margin-top: 0.5rem; display: block;">Coordinates help buyers find your exact location. Click "Get My Location" to auto-fill.</small>
+                    </div>
+                    
+                    <!-- Legacy Location Field (for backward compatibility) -->
+                    <input type="hidden" id="location_text" name="location" value="{{ old('location') }}" required>
                     
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
                         <div>
@@ -235,3 +297,179 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const regionSelect = document.getElementById('region_id');
+    const locationIdSelect = document.getElementById('location_id');
+    const locationTextField = document.getElementById('location_text');
+    const getLocationBtn = document.getElementById('get_location_btn');
+    const latitudeField = document.getElementById('latitude');
+    const longitudeField = document.getElementById('longitude');
+    
+    // Handle Region change
+    regionSelect.addEventListener('change', function() {
+        const regionId = this.value;
+        
+        // Reset city select
+        locationIdSelect.innerHTML = '<option value="">Select City</option>';
+        locationIdSelect.disabled = true;
+        
+        if (!regionId) {
+            updateLocationText();
+            return;
+        }
+        
+        // Show loading state
+        locationIdSelect.innerHTML = '<option value="">Loading cities...</option>';
+        
+        // Fetch "cities" (townships under the region's city)
+        console.log('Fetching townships for region ID:', regionId);
+        fetch(`/api/locations/descendants?region_id=${regionId}`)
+            .then(response => {
+                console.log('Descendants response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Descendants received data:', data);
+                locationIdSelect.innerHTML = '<option value="">Select City</option>';
+                
+                if (data && data.length > 0) {
+                    console.log('Adding', data.length, 'items to City dropdown');
+                    data.forEach(location => {
+                        const option = document.createElement('option');
+                        option.value = location.id;
+                        option.textContent = location.name; // e.g., Insein, Hlaing, etc.
+                        locationIdSelect.appendChild(option);
+                        console.log('Added City item:', location.name);
+                    });
+                    locationIdSelect.disabled = false; // enable dropdown
+                } else {
+                    console.log('No descendants found for region');
+                    locationIdSelect.innerHTML = '<option value="">No cities available</option>';
+                }
+                
+                updateLocationText();
+            })
+            .catch(error => {
+                console.error('Error fetching descendants:', error);
+                locationIdSelect.innerHTML = '<option value="">Error loading cities</option>';
+                alert('Failed to load cities. Error: ' + error.message);
+            });
+    });
+    
+    // Handle City selection
+    locationIdSelect.addEventListener('change', function() {
+        updateLocationText();
+    });
+    
+    // Function to update the location text field
+    function updateLocationText() {
+        const regionText = regionSelect.options[regionSelect.selectedIndex]?.text || '';
+        const cityText = locationIdSelect.options[locationIdSelect.selectedIndex]?.text || '';
+        
+        let locationParts = [];
+        
+        if (cityText && cityText !== 'Select City' && cityText !== 'No cities available' && cityText !== 'First select Region' && cityText !== 'Loading cities...' && cityText !== 'Error loading cities') {
+            locationParts.push(cityText);
+        }
+        if (regionText && regionText !== 'Select Region/State') {
+            locationParts.push(regionText);
+        }
+        
+        locationTextField.value = locationParts.join(', ');
+    }
+    
+    // Handle Get My Location button
+    getLocationBtn.addEventListener('click', function() {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser');
+            return;
+        }
+        
+        // Show loading state
+        this.textContent = 'Getting location...';
+        this.disabled = true;
+        
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                // Success callback
+                latitudeField.value = position.coords.latitude.toFixed(6);
+                longitudeField.value = position.coords.longitude.toFixed(6);
+                
+                // Reset button
+                getLocationBtn.textContent = 'Get My Location';
+                getLocationBtn.disabled = false;
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.style.cssText = 'color: #10b981; margin-top: 0.5rem; font-size: 0.875rem;';
+                successMsg.textContent = '✓ Location coordinates obtained successfully!';
+                getLocationBtn.parentNode.appendChild(successMsg);
+                
+                // Remove success message after 3 seconds
+                setTimeout(() => successMsg.remove(), 3000);
+            },
+            function(error) {
+                // Error callback
+                let errorMessage = 'Unable to get location. ';
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage += 'Permission denied.';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage += 'Location information unavailable.';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage += 'Request timed out.';
+                        break;
+                    default:
+                        errorMessage += 'An unknown error occurred.';
+                }
+                
+                alert(errorMessage);
+                
+                // Reset button
+                getLocationBtn.textContent = 'Get My Location';
+                getLocationBtn.disabled = false;
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    });
+    
+    // Load old values if they exist (for form validation errors)
+    const oldRegionId = '{{ old("region_id") }}';
+    const oldCityId = '{{ old("city_id") }}';
+    const oldLocationId = '{{ old("location_id") }}';
+    
+    if (oldRegionId && regionSelect.value) {
+        // Trigger region change to load cities
+        regionSelect.dispatchEvent(new Event('change'));
+        
+        // Wait for cities to load, then select old city
+        setTimeout(() => {
+            if (oldCityId) {
+                citySelect.value = oldCityId;
+                citySelect.dispatchEvent(new Event('change'));
+                
+                // Wait for townships to load, then select old township
+                setTimeout(() => {
+                    if (oldLocationId) {
+                        locationIdSelect.value = oldLocationId;
+                        updateLocationText();
+                    }
+                }, 500);
+            }
+        }, 500);
+    }
+});
+</script>
+@endpush

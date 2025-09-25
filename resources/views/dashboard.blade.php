@@ -55,16 +55,37 @@
         </div>
 
         <!-- Quick Actions -->
+        @php
+            $user = Auth::user();
+            $unreadCount = \App\Models\Chat::where(function($q) use ($user){
+                    $q->where('buyer_id', $user->id)->orWhere('seller_id', $user->id);
+                })
+                ->when(true, function($q) use ($user){
+                    if ($user->role === 'buyer') {
+                        $q->where('is_read_by_buyer', false);
+                    } else {
+                        $q->where('is_read_by_seller', false);
+                    }
+                })
+                ->count();
+        @endphp
         <div class="quick-actions">
             <h2>Quick Actions</h2>
             <div class="action-buttons">
-                <a href="{{ route('listings.create') }}" class="action-btn">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Create New Listing</span>
-                </a>
-                <a href="{{ route('messages.index') }}" class="action-btn">
+                @if(Auth::user()->role !== 'buyer')
+                    <a href="{{ route('listings.create') }}" class="action-btn">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Create New Listing</span>
+                    </a>
+                @endif
+                <a href="{{ route('messages.index') }}" class="action-btn" style="position: relative;">
                     <i class="fas fa-envelope"></i>
                     <span>View Messages</span>
+                    @if($unreadCount > 0)
+                        <span style="position:absolute; top:-6px; right:-6px; background:#ef4444; color:white; border-radius:999px; padding:0 6px; font-size:0.7rem; line-height:1.25rem; min-width:1.25rem; text-align:center;">
+                            {{ $unreadCount }}
+                        </span>
+                    @endif
                 </a>
                 <a href="{{ route('favorites.index') }}" class="action-btn">
                     <i class="fas fa-heart"></i>
@@ -119,7 +140,7 @@
                                 </a>
                             </td>
                             <td>{{ $listing->category->name ?? 'N/A' }}</td>
-                            <td class="price">${{ number_format($listing->price) }}</td>
+                            <td class="price">MMK {{ number_format($listing->price) }}</td>
                             <td>
                                 <span class="status-badge status-{{ $listing->status }}">
                                     {{ ucfirst($listing->status) }}
@@ -159,8 +180,12 @@
             <div class="empty-state">
                 <i class="fas fa-box-open"></i>
                 <h3>No listings yet</h3>
-                <p>Start selling by creating your first listing!</p>
-                <a href="{{ route('listings.create') }}" class="btn btn-primary">Create Listing</a>
+                @if(Auth::user()->role !== 'buyer')
+                    <p>Start selling by creating your first listing!</p>
+                    <a href="{{ route('listings.create') }}" class="btn btn-primary">Create Listing</a>
+                @else
+                    <p>Browsing as a buyer. You can favorite items or message sellers.</p>
+                @endif
             </div>
             @endif
         </div>

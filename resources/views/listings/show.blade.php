@@ -150,7 +150,7 @@
                 <!-- Price & Actions -->
                 <div class="sidebar-card">
                     <div class="price-section">
-                        <div class="price">${{ number_format($listing->price) }}</div>
+                        <div class="price">MMK {{ number_format($listing->price) }}</div>
                         @if($listing->is_featured)
                         <div class="featured-badge">
                             <i class="fas fa-star"></i>

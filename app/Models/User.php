@@ -28,6 +28,8 @@ class User extends Authenticatable
         'avatar',
         'bio',
         'address',
+        'detailed_address',
+        'location_id',
         'latitude',
         'longitude',
         'language',
@@ -58,6 +60,11 @@ class User extends Authenticatable
     ];
 
     // Relationships
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
+    }
+
     public function listings()
     {
         return $this->hasMany(Listing::class);

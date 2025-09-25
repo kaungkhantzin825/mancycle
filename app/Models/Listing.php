@@ -16,6 +16,7 @@ class Listing extends Model
         'condition',
         'user_id',
         'category_id',
+        'location_id',
         'status',
         'images',
         'videos',
@@ -28,6 +29,7 @@ class Listing extends Model
         'transmission',
         'color',
         'location',
+        'detailed_address',
         'latitude',
         'longitude',
         'contact_phone',
@@ -60,6 +62,11 @@ class Listing extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
     }
 
     public function chats()
